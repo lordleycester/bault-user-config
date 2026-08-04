@@ -3,6 +3,24 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/outputs.h>
 
+/*
+ * BaulT keymap — reconstructed from ZMK Studio (WKL layout) on 2026-08-04.
+ *
+ * Bindings are in the Default (39-key) layout order:
+ *   row 0: 11 keys (positions  0-10)
+ *   row 1: 10 keys (positions 11-20)
+ *   row 2: 10 keys (positions 21-30)
+ *   row 3:  8 keys (positions 31-38)
+ * The two &none keys in row 3 (col 1 = pos 32, col 8 = pos 37) are the
+ * 1u positions that don't exist in the WKL layout.
+ *
+ * Layers:
+ *   0 base      — mac base layer
+ *   1 num_nav   — numbers, arrows, Shift+Enter on left big key, screenshot on S
+ *   2 conn      — bluetooth, bootloader, Windows-mode toggle on W
+ *   3 win       — overlay that swaps GUI <-> Ctrl for Windows (toggle: layer 2 + W)
+ */
+
 / {
 
     behaviors {
@@ -19,36 +37,76 @@
         };
     };
 
+    combos {
+        compatible = "zmk,combos";
+
+        combo_esc {
+            timeout-ms = <50>;
+            key-positions = <0 1>;      /* Q + W */
+            bindings = <&kp ESC>;
+            layers = <0>;
+        };
+
+        combo_tab {
+            timeout-ms = <50>;
+            key-positions = <11 12>;    /* A + S */
+            bindings = <&kp TAB>;
+            layers = <0>;
+        };
+    };
+
+    /* Shift+Enter and Cmd+Shift+4 are plain modified keypresses (&kp LS(RET),
+     * &kp LG(LS(N4))) — no macros needed. For real multi-step macros, add:
+     *
+     * macros {
+     *     my_macro: my_macro {
+     *         compatible = "zmk,behavior-macro";
+     *         #binding-cells = <0>;
+     *         bindings = <&kp H &kp I>;
+     *     };
+     * };
+     */
 
     keymap {
         compatible = "zmk,keymap";
 
         base {
+            display-name = "Base";
             bindings = <
-                &kp Q      &kp W      &kp J      &kp R      &kp T      &kp Y      &kp U      &kp I      &kp O      &kp P      &kp LEFT_BRACKET
-                &hm LEFT_CONTROL A  &hm LEFT_ALT S  &hm LGUI D  &hm LEFT_SHIFT F  &kp G      &kp H      &hm RIGHT_SHIFT J  &hm RIGHT_GUI K  &hm LEFT_ALT L  &hm RCTRL SEMICOLON
-                &kp Z      &kp X      &kp C      &kp V      &kp B      &kp N      &kp M      &kp COMMA      &kp PERIOD      &kp SLASH
-                &kp N0      &mo 3      &kp ENTER      &kp SPACE      &kp BACKSPACE      &mo 1      &mo 2      &kp N0
+                &kp Q     &kp W     &kp E     &kp R           &kp T   &kp Y  &kp U           &kp I      &kp O    &kp P  &kp BSPC
+                &kp A     &kp S     &kp D     &hm LSHFT F     &kp G   &kp H  &hm RSHFT J     &kp K      &kp L    &kp SQT
+                &kp Z     &kp X     &kp C     &kp V           &kp B   &kp N  &kp M           &kp COMMA  &kp DOT  &kp SLASH
+                &kp LALT  &none     &kp LGUI  &kp RET         &lt 1 SPACE    &kp RCTRL       &none      &mo 2
             >;
         };
 
-
-        layer_1 {
+        num_nav {
+            display-name = "Num/Nav";
             bindings = <
-                &kp N1  &kp N2  &kp N3  &kp N4  &kp N5  &kp N6  &kp N7    &kp N8    &kp N9     &kp N0     &studio_unlock
-                &trans  &trans  &trans  &trans  &trans  &trans  &trans    &kp UP    &kp MINUS  &kp EQUAL
-                &trans  &trans  &trans  &trans  &trans  &trans  &kp LEFT  &kp DOWN  &kp RIGHT  &trans
-                &kp N0   &trans  &trans  &trans  &trans  &trans    &trans &kp N0
+                &kp N1  &kp N2          &kp N3  &kp N4       &kp N5  &kp N6  &kp N7    &kp N8    &kp N9     &kp N0  &studio_unlock
+                &trans  &kp LG(LS(N4))  &trans  &trans       &trans  &trans  &trans    &kp UP    &kp MINUS  &kp EQUAL
+                &trans  &trans          &trans  &trans       &trans  &trans  &kp LEFT  &kp DOWN  &kp RIGHT  &trans
+                &trans  &none           &trans  &kp LS(RET)  &trans  &trans  &none     &trans
             >;
         };
 
-
-        connectivity {
+        conn {
+            display-name = "Conn";
             bindings = <
-                &trans  &trans  &trans  &trans  &trans  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4  &bootloader
+                &trans  &tog 3  &trans  &trans  &trans  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4  &bootloader
+                &trans  &trans  &trans  &trans  &trans  &bt BT_CLR    &trans        &trans        &trans        &trans
                 &trans  &trans  &trans  &trans  &trans  &trans        &trans        &trans        &trans        &trans
-                &trans  &trans  &trans  &trans  &trans  &bt BT_CLR    &out OUT_BLE  &out OUT_USB  &out OUT_TOG  &trans
-                &kp N0   &trans  &trans  &trans  &trans        &trans        &trans &kp N0
+                &trans  &none   &trans  &trans  &trans  &trans        &none         &trans
+            >;
+        };
+
+        win {
+            display-name = "Win";
+            bindings = <
+                &trans  &trans  &trans     &trans  &trans  &trans  &trans     &trans  &trans  &trans  &trans
+                &trans  &trans  &trans     &trans  &trans  &trans  &trans     &trans  &trans  &trans
+                &trans  &trans  &trans     &trans  &trans  &trans  &trans     &trans  &trans  &trans
+                &trans  &none   &kp RCTRL  &trans  &trans  &kp LGUI           &none   &trans
             >;
         };
     };
