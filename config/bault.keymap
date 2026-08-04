@@ -44,14 +44,14 @@
             timeout-ms = <50>;
             key-positions = <0 1>;      /* Q + W */
             bindings = <&kp ESC>;
-            layers = <0>;
+            layers = <0 3>;
         };
 
         combo_tab {
             timeout-ms = <50>;
             key-positions = <11 12>;    /* A + S */
             bindings = <&kp TAB>;
-            layers = <0>;
+            layers = <0 3>;
         };
     };
 
